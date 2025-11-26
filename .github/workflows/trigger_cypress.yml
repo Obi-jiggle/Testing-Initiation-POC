@@ -3,8 +3,9 @@ name: Trigger E2E Tests
 on:
   push:
     branches:
-      - main     # Trigger when code is pushed to the 'main' branch
-      
+      - main     
+      - develop  
+
 jobs:
   trigger:
     runs-on: ubuntu-latest
@@ -12,14 +13,18 @@ jobs:
       - name: Send dispatch to Cypress Repo
         uses: peter-evans/repository-dispatch@v3
         with:
-          # TARGET REPOSITORY: The correct Cypress repo address
+          # This should be the name of your Cypress repository
           repository: Jiggle-Wallet/Cypress 
           
-          # EVENT TYPE: Must match the listener in the Cypress YML
+          # This must match the listener type in the Cypress workflow
           event-type: code-push-trigger 
           
-          # Pass along branch info for context (Optional)
-          client-payload: '{"branch": "${{ github.ref_name }}"}' 
+          # The payload is now minimal since the Cypress side hardcodes the spec file.
+          client-payload: >
+            {
+              "repo": "${{ github.repository }}", 
+              "branch": "${{ github.ref_name }}"
+            }
           
-          # Secret required to authenticate the request
+          # This secret must be created in the current (sending) application repository
           token: ${{ secrets.REPO_DISPATCH_TOKEN }}
