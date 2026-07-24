@@ -1,0 +1,29 @@
+name: Trigger Maestro Tests
+
+on:
+  push:
+    branches:
+      - main     
+      
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send dispatch to Maestro Repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          # This should be the name of your Maestro repository
+          repository: Jiggle-Wallet/Maestro 
+          
+          # This must match the listener type in the Maestro workflow
+          event-type: code-push-trigger 
+          
+          # The payload is now minimal since the Maestro side hardcodes the spec file.
+          client-payload: >
+            {
+              "repo": "${{ github.repository }}", 
+              "branch": "${{ github.ref_name }}"
+            }
+          
+          # This secret must be created in the current (sending) application repository
+          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
